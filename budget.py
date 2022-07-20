@@ -22,7 +22,7 @@ class Category:
         amount = f"{item['amount']:.2f}".rjust(7)
         return description + amount + "\n"
 
-    def deposit(self, amount, description):
+    def deposit(self, amount, description=""):
         deposit = {'amount': amount, 'description': description}
         self.ledger.append(deposit)
 
@@ -44,6 +44,7 @@ class Category:
             return False
         self.withdraw(amount, f"Transfer to {to_category.name}")
         to_category.deposit(amount, f"Transfer from {self.name}")
+        return True
 
     def get_spend(self):
         return sum(li['amount'] for li in self.ledger if li['amount'] < 0) * -1
@@ -63,6 +64,13 @@ def bar_chart_row(row_percent, percentages):
     return row + "\n"
 
 
+def key_row(place, names):
+    row = "     "
+    for name in names:
+        row += name[place] + "  "
+    return row + "\n"
+
+
 def create_spend_chart(categories):
     # create bars
     amounts_spent = [c.get_spend() for c in categories]
@@ -71,35 +79,38 @@ def create_spend_chart(categories):
 
     bar_chart = "Percentage spent by category\n"
 
-    for i in range(100, 0, -10):
+    for i in range(100, -10, -10):
         bar_chart += bar_chart_row(i, percentages)
 
     # create separator
-    bar_chart += "    -" + "-" * (3 * len(categories))
+    bar_chart += "    -" + "-" * (3 * len(categories)) + "\n"
 
     # create key
     names = [c.name for c in categories]
     max_length = max([len(name) for name in names])
     names = [name.ljust(max_length) for name in names]
 
+    for place in range(0, max_length):
+        bar_chart += key_row(place, names)
+
     return bar_chart
 
 
-food = Category("Food")
-food.deposit(1000, "initial deposit")
-food.withdraw(10.15, "groceries")
-food.withdraw(15.89, "restaurant and more food for dessert")
-print(food.get_balance())
-print(f"spent on food: {food.get_spend()}")
-clothing = Category("Clothing")
-food.transfer(50, clothing)
-clothing.withdraw(25.55)
-clothing.withdraw(100)
-auto = Category("Auto")
-auto.deposit(1000, "initial deposit")
-auto.withdraw(15)
+# food = Category("Food")
+# food.deposit(1000, "initial deposit")
+# food.withdraw(10.15, "groceries")
+# food.withdraw(15.89, "restaurant and more food for dessert")
+# print(food.get_balance())
+# print(f"spent on food: {food.get_spend()}")
+# clothing = Category("Clothing")
+# food.transfer(50, clothing)
+# clothing.withdraw(25.55)
+# clothing.withdraw(100)
+# auto = Category("Auto")
+# auto.deposit(1000, "initial deposit")
+# auto.withdraw(15)
 
 # print(food)
 # print(clothing)
 
-print(create_spend_chart([food, clothing, auto]))
+# print(create_spend_chart([food, clothing, auto]))

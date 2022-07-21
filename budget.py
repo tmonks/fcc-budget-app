@@ -60,7 +60,19 @@ def bar_chart_row(row_percent, percentages):
             row += "o  "
         else:
             row += "   "
-    return row + "\n"
+    return row
+
+
+def get_spend_percentages(categories):
+    amounts_spent = [c.get_spend() for c in categories]
+    total_amount_spent = sum(amounts_spent)
+
+    return [amt / total_amount_spent for amt in amounts_spent]
+
+
+def create_bar_chart_rows(categories):
+    percentages = get_spend_percentages(categories)
+    return [bar_chart_row(i, percentages) for i in range(100, -10, -10)]
 
 
 def key_row(place, names):
@@ -70,49 +82,38 @@ def key_row(place, names):
     return row
 
 
-def create_spend_chart(categories):
-    # create bars
-    amounts_spent = [c.get_spend() for c in categories]
-    total_amount_spent = sum(amounts_spent)
-    percentages = [amt / total_amount_spent for amt in amounts_spent]
-
-    bar_chart = "Percentage spent by category\n"
-
-    for i in range(100, -10, -10):
-        bar_chart += bar_chart_row(i, percentages)
-
-    # create separator
-    bar_chart += "    -" + "-" * (3 * len(categories)) + "\n"
-
-    # create key
+def create_key_rows(categories):
     names = [c.name for c in categories]
     max_length = max([len(name) for name in names])
     names = [name.ljust(max_length) for name in names]
 
-    for place in range(0, max_length):
-        if place == (max_length - 1):
-            bar_chart += key_row(place, names)
-        else:
-            bar_chart += key_row(place, names) + "\n"
-
-    return bar_chart
+    return [key_row(place, names) for place in range(0, max_length)]
 
 
-# food = Category("Food")
-# food.deposit(1000, "initial deposit")
-# food.withdraw(10.15, "groceries")
-# food.withdraw(15.89, "restaurant and more food for dessert")
-# print(food.get_balance())
-# print(f"spent on food: {food.get_spend()}")
-# clothing = Category("Clothing")
-# food.transfer(50, clothing)
-# clothing.withdraw(25.55)
-# clothing.withdraw(100)
-# auto = Category("Auto")
-# auto.deposit(1000, "initial deposit")
-# auto.withdraw(15)
+def create_spend_chart(categories):
+    rows = ["Percentage spent by category"]
+    rows += create_bar_chart_rows(categories)
+    rows.append("    -" + "-" * (3 * len(categories)))
+    rows += create_key_rows(categories)
+
+    return "\n".join(rows)
+
+
+food = Category("Food")
+food.deposit(1000, "initial deposit")
+food.withdraw(10.15, "groceries")
+food.withdraw(15.89, "restaurant and more food for dessert")
+print(food.get_balance())
+print(f"spent on food: {food.get_spend()}")
+clothing = Category("Clothing")
+food.transfer(50, clothing)
+clothing.withdraw(25.55)
+clothing.withdraw(100)
+auto = Category("Auto")
+auto.deposit(1000, "initial deposit")
+auto.withdraw(15)
 
 # print(food)
 # print(clothing)
 
-# print(create_spend_chart([food, clothing, auto]))
+print(create_spend_chart([food, clothing, auto]))

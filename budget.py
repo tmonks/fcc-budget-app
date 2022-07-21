@@ -5,7 +5,6 @@ class Category:
     def __init__(self, name):
         self.name = name
         self.ledger = []
-        print(self.name, "constructed")
 
     def __str__(self):
         text = self.name.center(30, "*") + "\n"
@@ -68,7 +67,7 @@ def key_row(place, names):
     row = "     "
     for name in names:
         row += name[place] + "  "
-    return row + "\n"
+    return row
 
 
 def create_spend_chart(categories):
@@ -91,7 +90,10 @@ def create_spend_chart(categories):
     names = [name.ljust(max_length) for name in names]
 
     for place in range(0, max_length):
-        bar_chart += key_row(place, names)
+        if place == (max_length - 1):
+            bar_chart += key_row(place, names)
+        else:
+            bar_chart += key_row(place, names) + "\n"
 
     return bar_chart
 
